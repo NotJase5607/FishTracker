@@ -22,6 +22,37 @@
         box-shadow: 0 5px 24px rgba(0,0,0,.35);
     }
     header h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 42px); }
+    header { position: relative; }
+    .header-nav {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 10px;
+    }
+    .header-nav a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-weight: 700;
+        color: white;
+        background: #0e6375;
+        transition: background .15s ease;
+    }
+    .header-nav a:hover { background: #157d92; }
+    .header-nav a.active { background: #20c5dd; color: #06151d; }
+    @media (max-width: 600px) {
+        .header-nav {
+            position: static;
+            transform: none;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    }
 
     .container {
         width: min(1400px, 95%);
@@ -298,6 +329,10 @@
 
 <header>
     <h1>🎣 Fish Tracker 🎣</h1>
+    <div class="header-nav">
+    <a href="https://notjase5607.github.io/FishTracker/index.html" class="active" role="button">Catalog</a>
+    <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
+</div>
 </header>
 
 <main class="container">
