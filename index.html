@@ -322,6 +322,170 @@
     .crop-controls label { font-size: 12px; color: #afd0d8; font-weight: 800; }
     .crop-controls input[type="range"] { flex: 1; accent-color: #20c5dd; min-width: 0; }
     .crop-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
+
+    /* ---- Achievements ---- */
+    .achievements-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+        background: rgba(3, 12, 16, .86);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .achievements-box {
+        background: #0a2732;
+        border: 1px solid #2c6070;
+        border-radius: 16px;
+        padding: 22px;
+        width: min(900px, 100%);
+        max-height: min(760px, 90vh);
+        overflow-y: auto;
+        box-shadow: 0 14px 50px rgba(0,0,0,.55);
+    }
+
+    .achievements-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+    }
+
+    .achievements-title {
+        font-size: 25px;
+        font-weight: 900;
+    }
+
+    .achievements-subtitle {
+        color: #afd0d8;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .achievement-progress {
+        height: 10px;
+        border-radius: 50px;
+        overflow: hidden;
+        background: #123b49;
+        margin: 8px 0 18px;
+    }
+
+    #achievementProgressFill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #18b8d2, #53dfa7);
+        transition: width .25s ease;
+    }
+
+    .achievement-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+    }
+
+    .achievement-card {
+        border: 1px solid #1a4653;
+        background: #08212c;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-height: 94px;
+        transition: transform .15s, border-color .15s;
+    }
+
+    .achievement-card.unlocked {
+        border-color: #1ca778;
+        background: #0b332b;
+    }
+
+    .achievement-card.locked {
+        opacity: .48;
+        filter: grayscale(.7);
+    }
+
+    .achievement-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        background: #123b47;
+    }
+
+    .achievement-card.unlocked .achievement-icon {
+        background: #155c4b;
+    }
+
+    .achievement-name {
+        font-size: 14px;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    .achievement-description {
+        font-size: 12px;
+        color: #afd0d8;
+        line-height: 1.35;
+    }
+
+    .achievement-status {
+        margin-top: 5px;
+        font-size: 10px;
+        font-weight: 900;
+        color: #56e0ad;
+        letter-spacing: .4px;
+    }
+
+    .achievement-toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 1200;
+        width: min(340px, calc(100% - 40px));
+        background: #0a2732;
+        border: 1px solid #20c5dd;
+        border-radius: 13px;
+        padding: 14px 16px;
+        box-shadow: 0 10px 35px rgba(0,0,0,.45);
+        transform: translateY(130px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .achievement-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .achievement-toast-title {
+        font-size: 12px;
+        font-weight: 900;
+        color: #20c5dd;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .achievement-toast-name {
+        font-size: 17px;
+        font-weight: 900;
+        margin-top: 3px;
+    }
+
+    @media (max-width: 600px) {
+        .achievements-box { padding: 16px; }
+        .achievements-title { font-size: 21px; }
+        .achievement-grid { grid-template-columns: 1fr; }
+    }
+
 </style>
 </head>
 
@@ -332,6 +496,7 @@
     <div class="header-nav">
     <a href="https://notjase5607.github.io/FishTracker/index.html" class="active" role="button">Catalog</a>
     <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
+    <a href="#" role="button" onclick="openAchievements(); return false;">🏆 Achievements</a>
 </div>
 </header>
 
@@ -371,6 +536,27 @@
     <div id="empty">No species matching your criteria.</div>
 
     <input type="file" id="cardImageInput" accept="image/*" style="display:none">
+
+
+    <!-- Achievements modal -->
+    <div id="achievementsModal" class="achievements-modal" style="display:none" onclick="if(event.target===this) closeAchievements()">
+        <div class="achievements-box">
+            <div class="achievements-top">
+                <div class="achievements-title">🏆 Achievements</div>
+                <button class="secondary" onclick="closeAchievements()">Close</button>
+            </div>
+            <div id="achievementSummary" class="achievements-subtitle">0 / 0 unlocked</div>
+            <div class="achievement-progress">
+                <div id="achievementProgressFill"></div>
+            </div>
+            <div id="achievementGrid" class="achievement-grid"></div>
+        </div>
+    </div>
+
+    <div id="achievementToast" class="achievement-toast">
+        <div class="achievement-toast-title">🏆 Achievement Unlocked!</div>
+        <div id="achievementToastName" class="achievement-toast-name"></div>
+    </div>
 
     <!-- Crop/Edit modal -->
     <div id="cropModal" class="crop-modal" style="display:none">
@@ -15297,6 +15483,158 @@ let caughtData = {};
 let currentStatusFilter = 'all';
 let activeUploadKey = null;
 
+
+const ACHIEVEMENTS = [
+    { id: "first", icon: "🐣", name: "First Catch", description: "Catch your first fish.", test: c => c >= 1 },
+    { id: "five", icon: "🎣", name: "Getting Started", description: "Catch 5 different species.", test: c => c >= 5 },
+    { id: "ten", icon: "🐟", name: "Hooked", description: "Catch 10 different species.", test: c => c >= 10 },
+    { id: "twentyfive", icon: "🔥", name: "On Fire", description: "Catch 25 different species.", test: c => c >= 25 },
+    { id: "fifty", icon: "🏅", name: "Fifty Species", description: "Catch 50 different species.", test: c => c >= 50 },
+    { id: "hundred", icon: "💯", name: "Century Club", description: "Catch 100 different species.", test: c => c >= 100 },
+    { id: "freshwater25", icon: "🏞️", name: "Freshwater Fisher", description: "Catch 25 freshwater species.", test: (c, cats) => cats.Freshwater >= 25 },
+    { id: "saltwater25", icon: "🌊", name: "Ocean Explorer", description: "Catch 25 saltwater species.", test: (c, cats) => (cats["Saltwater Inshore"] + cats["Saltwater Offshore"]) >= 25 },
+    { id: "sharks10", icon: "🦈", name: "Shark Hunter", description: "Catch 10 species from Sharks & Rays.", test: (c, cats) => cats["Sharks & Rays"] >= 10 },
+    { id: "categories", icon: "🌎", name: "Fish Everywhere", description: "Catch at least one species from every category.", test: (c, cats) => Object.keys(cats).every(cat => cats[cat] > 0) },
+    { id: "photos10", icon: "📸", name: "Picture Perfect", description: "Add photos to 10 caught fish.", test: (c, cats, photos) => photos >= 10 },
+    { id: "halfway", icon: "🚀", name: "Halfway There", description: "Catch half of the fish in the catalog.", test: (c) => BASE_SPECIES.length > 0 && c >= Math.ceil(BASE_SPECIES.length / 2) },
+    { id: "complete", icon: "👑", name: "Master Angler", description: "Catch every fish in the catalog.", test: (c) => BASE_SPECIES.length > 0 && c >= BASE_SPECIES.length }
+];
+
+let unlockedAchievements = new Set();
+let achievementToastTimer = null;
+
+function getAchievementStats() {
+    let caught = 0;
+    let photos = 0;
+    const cats = {};
+
+    BASE_SPECIES.forEach(fish => {
+        cats[fish.cat] = cats[fish.cat] || 0;
+        const record = caughtData[getFishKey(fish)];
+
+        if (record && record.caught) {
+            caught++;
+            cats[fish.cat]++;
+            if (record.img) photos++;
+        }
+    });
+
+    return { caught, photos, cats };
+}
+
+function getUnlockedAchievementIds() {
+    const stats = getAchievementStats();
+
+    return new Set(
+        ACHIEVEMENTS
+            .filter(a => a.test(stats.caught, stats.cats, stats.photos))
+            .map(a => a.id)
+    );
+}
+
+function checkAchievements(showNew = true) {
+    const nowUnlocked = getUnlockedAchievementIds();
+
+    if (showNew) {
+        ACHIEVEMENTS.forEach(a => {
+            if (nowUnlocked.has(a.id) && !unlockedAchievements.has(a.id)) {
+                showAchievementToast(a);
+            }
+        });
+    }
+
+    unlockedAchievements = nowUnlocked;
+
+    const modal = document.getElementById("achievementsModal");
+    if (modal && modal.style.display !== "none") {
+        renderAchievements();
+    }
+}
+
+function showAchievementToast(achievement) {
+    const toast = document.getElementById("achievementToast");
+    const name = document.getElementById("achievementToastName");
+    if (!toast || !name) return;
+
+    name.textContent = `${achievement.icon} ${achievement.name}`;
+    toast.classList.add("show");
+
+    clearTimeout(achievementToastTimer);
+    achievementToastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3500);
+}
+
+function renderAchievements() {
+    const grid = document.getElementById("achievementGrid");
+    const summary = document.getElementById("achievementSummary");
+    const fill = document.getElementById("achievementProgressFill");
+    if (!grid || !summary || !fill) return;
+
+    const unlocked = getUnlockedAchievementIds();
+    const count = unlocked.size;
+    const percent = ACHIEVEMENTS.length ? Math.round((count / ACHIEVEMENTS.length) * 100) : 0;
+
+    summary.textContent = `${count} / ${ACHIEVEMENTS.length} unlocked (${percent}%)`;
+    fill.style.width = `${percent}%`;
+    grid.innerHTML = "";
+
+    ACHIEVEMENTS.forEach(a => {
+        const isUnlocked = unlocked.has(a.id);
+        const card = document.createElement("div");
+        card.className = `achievement-card ${isUnlocked ? "unlocked" : "locked"}`;
+
+        const icon = document.createElement("div");
+        icon.className = "achievement-icon";
+        icon.textContent = isUnlocked ? a.icon : "🔒";
+
+        const info = document.createElement("div");
+        info.style.flex = "1";
+
+        const name = document.createElement("div");
+        name.className = "achievement-name";
+        name.textContent = a.name;
+
+        const description = document.createElement("div");
+        description.className = "achievement-description";
+        description.textContent = a.description;
+
+        const status = document.createElement("div");
+        status.className = "achievement-status";
+        status.textContent = isUnlocked ? "UNLOCKED ✓" : "LOCKED";
+
+        info.appendChild(name);
+        info.appendChild(description);
+        info.appendChild(status);
+        card.appendChild(icon);
+        card.appendChild(info);
+        grid.appendChild(card);
+    });
+}
+
+function openAchievements() {
+    const modal = document.getElementById("achievementsModal");
+    if (!modal) return;
+
+    checkAchievements(false);
+    renderAchievements();
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function closeAchievements() {
+    const modal = document.getElementById("achievementsModal");
+    if (!modal) return;
+
+    modal.style.display = "none";
+    document.body.style.overflow = "";
+}
+
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeAchievements();
+});
+
+
 function loadStorage() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY_CAUGHT);
@@ -15346,6 +15684,7 @@ function toggleCaught(key) {
     }
     saveStorage();
     render();
+    checkAchievements(true);
 }
 
 function updateField(key, field, value) {
@@ -15366,6 +15705,7 @@ function removeImage(key) {
     record.img = "";
     saveStorage();
     render();
+    checkAchievements(false);
 }
 
 /* ============ Crop/Edit image flow ============ */
@@ -15557,6 +15897,7 @@ document.getElementById('cropDone').addEventListener('click', function () {
     saveStorage();
     closeCropEditor();
     render();
+    checkAchievements(true);
 });
 
 // --- Cancel: keep the previous image, close the editor ---
@@ -15800,6 +16141,7 @@ function importData(event) {
                 caughtData = imported;
                 saveStorage();
                 render();
+                checkAchievements(true);
                 alert('Data imported successfully!');
             } else {
                 alert('Invalid JSON structure.');
@@ -15816,12 +16158,15 @@ function resetCaught() {
         caughtData = {};
         saveStorage();
         render();
+        unlockedAchievements = new Set();
+        checkAchievements(false);
     }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     loadStorage();
     render();
+    checkAchievements(false);
 });
 </script>
 </body>
