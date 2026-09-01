@@ -323,6 +323,105 @@
     .crop-controls input[type="range"] { flex: 1; accent-color: #20c5dd; min-width: 0; }
     .crop-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
 
+    /* ---- Fisher Level / XP ---- */
+    .level-stats { padding: 18px 20px; margin-bottom: 16px; }
+    .level-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .level-title { font-size: 30px; font-weight: 900; }
+    .level-label { font-size: 15px; font-weight: 800; color: #7fd8e8; }
+    .level-xp-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 13px; }
+    .level-xp-text { font-weight: 800; }
+    .level-next { color: #afd0d8; font-weight: 600; }
+    .level-blocks { display: flex; gap: 4px; margin: 8px 0 4px; }
+    .block { flex: 1; height: 14px; border-radius: 3px; background: #123b49; }
+    .block.filled { background: linear-gradient(90deg, #f6c945, #f9a825); box-shadow: 0 0 6px rgba(246,201,69,.5); }
+
+    .level-toast {
+        position: fixed; left: 50%; top: 20px; transform: translateX(-50%) translateY(-160px);
+        z-index: 1300; background: linear-gradient(135deg, #3d3a14, #6b5200);
+        border: 1px solid #f6c945; border-radius: 14px; padding: 14px 26px;
+        text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.55); opacity: 0;
+        transition: transform .35s ease, opacity .35s ease; pointer-events: none; min-width: 250px;
+    }
+    .level-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .level-toast-title { font-size: 13px; font-weight: 900; color: #ffd75e; text-transform: uppercase; letter-spacing: .6px; }
+    .level-toast-name { font-size: 24px; font-weight: 900; margin-top: 2px; }
+    .level-toast-sub { font-size: 13px; color: #ffe9a3; margin-top: 3px; font-weight: 700; }
+
+    .xp-toast {
+        position: fixed; right: 20px; bottom: 20px; z-index: 1300;
+        background: #0a2732; border: 1px solid #29dfa7; border-radius: 999px;
+        padding: 11px 18px; display: flex; align-items: center; gap: 9px;
+        box-shadow: 0 10px 35px rgba(0,0,0,.45); transform: translateY(140px); opacity: 0;
+        pointer-events: none; transition: transform .25s ease, opacity .25s ease; font-weight: 800; font-size: 13px;
+    }
+    .xp-toast.show { transform: translateY(0); opacity: 1; }
+    .xp-toast-icon { font-size: 18px; }
+
+    /* ---- Social feed ---- */
+    .social-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+        background: rgba(3, 12, 16, .86);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+    .social-box {
+        background: #0a2732;
+        border: 1px solid #2c6070;
+        border-radius: 16px;
+        padding: 22px;
+        width: min(720px, 100%);
+        max-height: min(780px, 92vh);
+        overflow-y: auto;
+        box-shadow: 0 14px 50px rgba(0,0,0,.55);
+    }
+    .social-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .social-title { font-size: 25px; font-weight: 900; }
+    .social-subtitle { color: #afd0d8; font-size: 13px; margin-bottom: 18px; }
+
+    .feed-list { display: flex; flex-direction: column; gap: 16px; }
+    .feed-card {
+        background: #08212c;
+        border: 1px solid #1a4653;
+        border-radius: 12px;
+        padding: 14px;
+    }
+    .feed-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .feed-name { font-size: 17px; font-weight: 900; }
+    .feed-sci { margin-top: 3px; font-size: 12px; font-style: italic; color: #afd0d8; }
+    .feed-tag {
+        display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 999px;
+        background: #123b47; color: #bde6ed; font-size: 11px; font-weight: 600;
+    }
+    .feed-time { font-size: 11px; color: #7f9ba4; white-space: nowrap; font-weight: 600; }
+    .feed-img {
+        width: 100%; height: 210px; object-fit: cover; border-radius: 8px;
+        margin-top: 12px; background: #061821;
+    }
+    .feed-details { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .feed-detail { font-size: 13px; color: #e8f4f8; }
+    .feed-detail b { color: #7fd8e8; font-weight: 800; }
+    .feed-cat-row { margin-top: 8px; }
+    .empty-feed { text-align: center; padding: 50px 20px; opacity: .7; }
+    .empty-feed .big { font-size: 40px; display: block; margin-bottom: 10px; }
+
+    .card-action { margin-top: 10px; }
+    .publish-btn {
+        width: 100%; border: 0; border-radius: 8px; padding: 10px 14px;
+        font-weight: 800; color: #06151d; background: linear-gradient(90deg, #20c5dd, #53dfa7);
+        cursor: pointer; transition: transform .12s, filter .12s;
+    }
+    .publish-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .published-label {
+        width: 100%; text-align: center; border-radius: 8px; padding: 10px 14px;
+        font-weight: 800; font-size: 13px; color: #56e0ad;
+        background: #0b332b; border: 1px solid #1ca778;
+    }
+
+
     /* ---- Achievements ---- */
     .achievements-modal {
         position: fixed;
@@ -497,10 +596,26 @@
     <a href="https://notjase5607.github.io/FishTracker/index.html" class="active" role="button">Catalog</a>
     <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
     <a href="#" role="button" onclick="openAchievements(); return false;">Achievements</a>
+    <a href="#" role="button" onclick="openSocial(); return false;">Social</a>
 </div>
 </header>
 
 <main class="container">
+
+    <section class="panel level-stats">
+        <div class="level-row">
+            <div class="level-title">🐟 <span id="levelTitle">Beginner</span></div>
+            <div id="levelLabel" class="level-label">Fisher Level 1</div>
+        </div>
+        <div class="level-xp-row">
+            <div id="levelXpText" class="level-xp-text">0 / 100 XP</div>
+            <div id="levelNext" class="level-next"></div>
+        </div>
+        <div class="level-blocks" id="levelBlocks"></div>
+        <div class="progress">
+            <div id="levelFill"></div>
+        </div>
+    </section>
 
     <section class="panel stats">
         <div class="stats-row">
@@ -553,9 +668,41 @@
         </div>
     </div>
 
+    <!-- Social feed modal -->
+    <div id="socialModal" class="social-modal" style="display:none" onclick="if(event.target===this) closeSocial()">
+        <div class="social-box">
+            <div class="social-top">
+                <div class="social-title">Social Feed</div>
+                <button class="secondary" onclick="closeSocial()">Close</button>
+            </div>
+            <div id="socialSummary" class="social-subtitle">0 catches in the feed</div>
+            <div id="feedList" class="feed-list"></div>
+            <div id="feedEmpty" class="empty-feed">
+                <span class="big">🐠</span>
+                No catches published yet.<br>Check off a fish, add a photo, then hit <b>Publish to Social</b>.
+            </div>
+        </div>
+    </div>
+
     <div id="achievementToast" class="achievement-toast">
         <div class="achievement-toast-title">Achievement Unlocked!</div>
         <div id="achievementToastName" class="achievement-toast-name"></div>
+    </div>
+
+    <div id="levelToast" class="level-toast">
+        <div class="level-toast-title">🎉 Level Up!</div>
+        <div id="levelToastName" class="level-toast-name"></div>
+        <div id="levelToastSub" class="level-toast-sub"></div>
+    </div>
+
+    <div id="xpToast" class="xp-toast">
+        <div class="xp-toast-icon">✨</div>
+        <div id="xpToastText" class="xp-toast-text"></div>
+    </div>
+
+    <div id="socialToast" class="achievement-toast">
+        <div class="achievement-toast-title">Published to Social</div>
+        <div id="socialToastName" class="achievement-toast-name"></div>
     </div>
 
     <!-- Crop/Edit modal -->
@@ -581,6 +728,7 @@
 
 <script>
 const STORAGE_KEY_CAUGHT = "guidesly_master_caught_v148";
+const STORAGE_KEY_FEED = "guidesly_master_feed_v1";
 
 const BASE_SPECIES = [
     { common: "African Pompano", scientific: "Alectis ciliaris", cat: "Saltwater Offshore" },
@@ -15506,6 +15654,7 @@ let achievementToastTimer = null;
 function getAchievementStats() {
     let caught = 0;
     let photos = 0;
+    let locations = 0;
     const cats = {};
 
     BASE_SPECIES.forEach(fish => {
@@ -15516,10 +15665,11 @@ function getAchievementStats() {
             caught++;
             cats[fish.cat]++;
             if (record.img) photos++;
+            if (record.location && record.location.trim()) locations++;
         }
     });
 
-    return { caught, photos, cats };
+    return { caught, photos, cats, locations };
 }
 
 function getUnlockedAchievementIds() {
@@ -15539,6 +15689,7 @@ function checkAchievements(showNew = true) {
         ACHIEVEMENTS.forEach(a => {
             if (nowUnlocked.has(a.id) && !unlockedAchievements.has(a.id)) {
                 showAchievementToast(a);
+                updateLevel(true, XP_ACHIEVEMENT, "Achievement unlocked");
             }
         });
     }
@@ -15632,7 +15783,305 @@ function closeAchievements() {
 
 document.addEventListener("keydown", e => {
     if (e.key === "Escape") closeAchievements();
+    if (e.key === "Escape") closeSocial();
 });
+
+
+/* ============ XP & Fisher Level ============ */
+
+const XP_CATCH = 20;        // catching a fish
+const XP_PHOTO = 15;        // adding a photo
+const XP_LOCATION = 10;     // logging a location
+const XP_ACHIEVEMENT = 40;  // unlocking an achievement
+
+const FISHER_TITLES = [
+    { level: 1,   title: "Beginner" },
+    { level: 10,  title: "Angler" },
+    { level: 25,  title: "Pro Fisher" },
+    { level: 50,  title: "Master Angler" },
+    { level: 100, title: "Fishing Legend" },
+];
+
+function getFisherTitle(level) {
+    let title = "Beginner";
+    for (const t of FISHER_TITLES) {
+        if (level >= t.level) title = t.title;
+    }
+    return title;
+}
+
+function xpToNextLevel(level) {
+    return 100 + (level - 1) * 40;
+}
+
+function getLevelInfo(totalXp) {
+    let level = 1;
+    let xpInto = totalXp;
+    let toNext = xpToNextLevel(level);
+    while (xpInto >= toNext) {
+        xpInto -= toNext;
+        level++;
+        toNext = xpToNextLevel(level);
+    }
+    return { level, xpInto, toNext, totalXp };
+}
+
+function getTotalXp() {
+    const stats = getAchievementStats();
+    const achievements = getUnlockedAchievementIds().size;
+    return stats.caught * XP_CATCH
+         + stats.photos * XP_PHOTO
+         + stats.locations * XP_LOCATION
+         + achievements * XP_ACHIEVEMENT;
+}
+
+/* ---- Level & XP UI ---- */
+let lastLevel = 0;
+let lastTotalXp = 0;
+let xpToastTimer = null;
+let levelToastTimer = null;
+
+function renderLevelPanel() {
+    const totalXp = getTotalXp();
+    const info = getLevelInfo(totalXp);
+    const title = getFisherTitle(info.level);
+    const elTitle = document.getElementById("levelTitle");
+    if (!elTitle) return;
+
+    elTitle.textContent = title;
+    document.getElementById("levelLabel").textContent = `Fisher Level ${info.level}`;
+    document.getElementById("levelXpText").textContent = `${info.xpInto} / ${info.toNext} XP`;
+
+    const nextTitle = getFisherTitle(info.level + 1);
+    document.getElementById("levelNext").textContent = nextTitle === title ? "" : `Next: ${nextTitle}`;
+
+    const pct = Math.round((info.xpInto / info.toNext) * 100);
+    document.getElementById("levelFill").style.width = `${pct}%`;
+
+    const blocks = document.getElementById("levelBlocks");
+    if (blocks) {
+        const total = 10;
+        const filled = Math.round((info.xpInto / info.toNext) * total);
+        blocks.innerHTML = "";
+        for (let i = 0; i < total; i++) {
+            const b = document.createElement("span");
+            b.className = "block" + (i < filled ? " filled" : "");
+            blocks.appendChild(b);
+        }
+    }
+}
+
+function updateLevel(showGain = false, gainXp = 0, sourceName = "") {
+    const totalXp = getTotalXp();
+    const info = getLevelInfo(totalXp);
+    renderLevelPanel();
+
+    if (info.level > lastLevel) {
+        showLevelToast(info.level);
+        lastLevel = info.level;
+        lastTotalXp = totalXp;
+        return;
+    }
+
+    if (showGain && gainXp > 0 && totalXp > lastTotalXp) {
+        showXpToast(gainXp, sourceName);
+    }
+
+    lastLevel = info.level;
+    lastTotalXp = totalXp;
+}
+
+function showXpToast(xp, source) {
+    const toast = document.getElementById("xpToast");
+    const text = document.getElementById("xpToastText");
+    if (!toast || !text) return;
+    text.textContent = `+${xp} XP  ·  ${source}`;
+    toast.classList.add("show");
+    clearTimeout(xpToastTimer);
+    xpToastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function showLevelToast(level) {
+    const toast = document.getElementById("levelToast");
+    const name = document.getElementById("levelToastName");
+    const sub = document.getElementById("levelToastSub");
+    if (!toast || !name || !sub) return;
+    name.textContent = `Fisher Level ${level}`;
+    sub.textContent = getFisherTitle(level);
+    toast.classList.add("show");
+    clearTimeout(levelToastTimer);
+    levelToastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+
+/* ============ Social Feed ============ */
+
+let socialPosts = [];
+let socialToastTimer = null;
+
+function loadFeed() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY_FEED);
+        if (raw) socialPosts = JSON.parse(raw);
+    } catch (e) {
+        console.error("Failed to load social feed:", e);
+        socialPosts = [];
+    }
+}
+
+function saveFeed() {
+    try {
+        localStorage.setItem(STORAGE_KEY_FEED, JSON.stringify(socialPosts));
+    } catch (e) {
+        console.error("Failed to save social feed:", e);
+    }
+}
+
+function isPublishedPost(key) {
+    return socialPosts.some(p => p.key === key);
+}
+
+function publishCatch(key) {
+    const record = getFishRecord(key);
+    if (!record.caught || !record.img) return;
+    const fish = BASE_SPECIES.find(f => getFishKey(f) === key);
+    if (!fish) return;
+
+    const post = {
+        key,
+        common: fish.common,
+        scientific: fish.scientific,
+        cat: fish.cat,
+        img: record.img,
+        date: record.date || "",
+        location: record.location || "",
+        weight: record.weight || "",
+        length: record.length || "",
+        bait: record.bait || "",
+        notes: record.notes || "",
+        created: Date.now()
+    };
+
+    // Re-publishing a catch replaces its old post and moves it to the top.
+    socialPosts = socialPosts.filter(p => p.key !== key);
+    socialPosts.unshift(post);
+    saveFeed();
+
+    render();
+    renderSocial(); // refresh if the modal is open
+    showSocialToast(`${fish.common} is now on the feed!`);
+}
+
+function timeAgo(ts) {
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return "just now";
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    if (d < 7) return `${d}d ago`;
+    return new Date(ts).toLocaleDateString();
+}
+
+function renderSocial() {
+    const list = document.getElementById("feedList");
+    const empty = document.getElementById("feedEmpty");
+    const summary = document.getElementById("socialSummary");
+    if (!list || !empty || !summary) return;
+
+    summary.textContent = `${socialPosts.length} catch${socialPosts.length === 1 ? "" : "es"} in the feed`;
+    list.innerHTML = "";
+
+    if (socialPosts.length === 0) {
+        empty.style.display = "block";
+        return;
+    }
+    empty.style.display = "none";
+
+    socialPosts.forEach(post => {
+        const card = document.createElement("div");
+        card.className = "feed-card";
+
+        const header = document.createElement("div");
+        header.className = "feed-header";
+        const titleWrap = document.createElement("div");
+
+        const name = document.createElement("div");
+        name.className = "feed-name";
+        name.textContent = post.common;
+        const sci = document.createElement("div");
+        sci.className = "feed-sci";
+        sci.textContent = post.scientific;
+        const tag = document.createElement("span");
+        tag.className = "feed-tag";
+        tag.textContent = post.cat;
+        titleWrap.appendChild(name);
+        titleWrap.appendChild(sci);
+        titleWrap.appendChild(tag);
+
+        const time = document.createElement("div");
+        time.className = "feed-time";
+        time.textContent = timeAgo(post.created);
+
+        header.appendChild(titleWrap);
+        header.appendChild(time);
+        card.appendChild(header);
+
+        const img = document.createElement("img");
+        img.src = post.img;
+        img.alt = post.common;
+        img.className = "feed-img";
+        card.appendChild(img);
+
+        const details = document.createElement("div");
+        details.className = "feed-details";
+        const rows = [];
+        if (post.date) rows.push(["Date", post.date]);
+        if (post.location) rows.push(["Location", post.location]);
+        if (post.weight) rows.push(["Weight", post.weight]);
+        if (post.length) rows.push(["Length", post.length]);
+        if (post.bait) rows.push(["Bait", post.bait]);
+        if (post.notes) rows.push(["Notes", post.notes]);
+        rows.forEach(([label, val]) => {
+            const row = document.createElement("div");
+            row.className = "feed-detail";
+            const b = document.createElement("b");
+            b.textContent = label + ": ";
+            row.appendChild(b);
+            row.appendChild(document.createTextNode(val));
+            details.appendChild(row);
+        });
+        card.appendChild(details);
+
+        list.appendChild(card);
+    });
+}
+
+function openSocial() {
+    const modal = document.getElementById("socialModal");
+    if (!modal) return;
+    renderSocial();
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function closeSocial() {
+    const modal = document.getElementById("socialModal");
+    if (!modal) return;
+    modal.style.display = "none";
+    document.body.style.overflow = "";
+}
+
+function showSocialToast(message) {
+    const toast = document.getElementById("socialToast");
+    const name = document.getElementById("socialToastName");
+    if (!toast || !name) return;
+    name.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(socialToastTimer);
+    socialToastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
 
 
 function loadStorage() {
@@ -15661,7 +16110,7 @@ function getFishKey(fish) {
 
 function getFishRecord(key) {
     if (!caughtData[key]) {
-        caughtData[key] = { caught: false, date: "", notes: "", img: "" };
+        caughtData[key] = { caught: false, date: "", notes: "", img: "", location: "", bait: "" };
     }
     return caughtData[key];
 }
@@ -15678,6 +16127,7 @@ function setFilter(status) {
 
 function toggleCaught(key) {
     const record = getFishRecord(key);
+    const wasCaught = record.caught;
     record.caught = !record.caught;
     if (record.caught && !record.date) {
         record.date = new Date().toISOString().split('T')[0];
@@ -15685,12 +16135,21 @@ function toggleCaught(key) {
     saveStorage();
     render();
     checkAchievements(true);
+    if (record.caught && !wasCaught) {
+        updateLevel(true, XP_CATCH, "Caught a fish");
+    } else {
+        updateLevel(false);
+    }
 }
 
 function updateField(key, field, value) {
     const record = getFishRecord(key);
+    const wasEmpty = !(record.location && record.location.trim());
     record[field] = value;
     saveStorage();
+    if (field === "location" && wasEmpty && value && value.trim()) {
+        updateLevel(true, XP_LOCATION, "Logged a location");
+    }
 }
 
 function triggerImageUpload(key) {
@@ -15893,11 +16352,13 @@ document.getElementById('cropDone').addEventListener('click', function () {
     ctx.drawImage(cropState.source, sx, sy, sw, sh, 0, 0, outW, outH);
 
     const record = getFishRecord(activeUploadKey);
+    const hadImg = !!record.img;
     record.img = canvas.toDataURL('image/jpeg', 0.9);
     saveStorage();
     closeCropEditor();
     render();
     checkAchievements(true);
+    if (!hadImg) updateLevel(true, XP_PHOTO, "Added a photo");
 });
 
 // --- Cancel: keep the previous image, close the editor ---
@@ -15942,6 +16403,8 @@ function render() {
     
     document.getElementById('progressText').innerText = `${totalCaught} / ${totalSpecies} Caught (${percentage}%)`;
     document.getElementById('progressFill').style.width = `${percentage}%`;
+
+    renderLevelPanel();
 
     // Filter Species
     const filtered = BASE_SPECIES.filter(fish => {
@@ -16057,10 +16520,22 @@ function render() {
             const details = document.createElement('div');
             details.className = 'catch-details';
 
+            const locationField = document.createElement('div');
+            locationField.className = 'catch-field';
+            const locationLabel = document.createElement('label');
+            locationLabel.textContent = '1. Location';
+            const locationInput = document.createElement('input');
+            locationInput.type = 'text';
+            locationInput.placeholder = 'Body of water, spot name...';
+            locationInput.value = record.location || '';
+            locationInput.onchange = (e) => updateField(key, 'location', e.target.value);
+            locationField.appendChild(locationLabel);
+            locationField.appendChild(locationInput);
+
             const dateField = document.createElement('div');
             dateField.className = 'catch-field';
             const dateLabel = document.createElement('label');
-            dateLabel.textContent = '1. Date';
+            dateLabel.textContent = '2. Date';
             const dateInput = document.createElement('input');
             dateInput.type = 'date';
             dateInput.value = record.date || '';
@@ -16068,10 +16543,22 @@ function render() {
             dateField.appendChild(dateLabel);
             dateField.appendChild(dateInput);
 
+            const baitField = document.createElement('div');
+            baitField.className = 'catch-field';
+            const baitLabel = document.createElement('label');
+            baitLabel.textContent = '3. Bait';
+            const baitInput = document.createElement('input');
+            baitInput.type = 'text';
+            baitInput.placeholder = 'Bait used';
+            baitInput.value = record.bait || '';
+            baitInput.oninput = (e) => updateField(key, 'bait', e.target.value);
+            baitField.appendChild(baitLabel);
+            baitField.appendChild(baitInput);
+
             const weightField = document.createElement('div');
             weightField.className = 'catch-field';
             const weightLabel = document.createElement('label');
-            weightLabel.textContent = '2. Weight';
+            weightLabel.textContent = '4. Weight';
             const weightInput = document.createElement('input');
             weightInput.type = 'text';
             weightInput.inputMode = 'decimal';
@@ -16084,7 +16571,7 @@ function render() {
             const lengthField = document.createElement('div');
             lengthField.className = 'catch-field';
             const lengthLabel = document.createElement('label');
-            lengthLabel.textContent = '3. Length';
+            lengthLabel.textContent = '5. Length';
             const lengthInput = document.createElement('input');
             lengthInput.type = 'text';
             lengthInput.inputMode = 'decimal';
@@ -16097,21 +16584,42 @@ function render() {
             const notesField = document.createElement('div');
             notesField.className = 'catch-field';
             const notesLabel = document.createElement('label');
-            notesLabel.textContent = '4. Notes';
+            notesLabel.textContent = '6. Notes';
             const notesInput = document.createElement('input');
             notesInput.type = 'text';
-            notesInput.placeholder = 'Location, bait, conditions, etc.';
+            notesInput.placeholder = 'Bait, conditions, etc.';
             notesInput.value = record.notes || '';
             notesInput.oninput = (e) => updateField(key, 'notes', e.target.value);
             notesField.appendChild(notesLabel);
             notesField.appendChild(notesInput);
 
+            details.appendChild(locationField);
             details.appendChild(dateField);
+            details.appendChild(baitField);
             details.appendChild(weightField);
             details.appendChild(lengthField);
             details.appendChild(notesField);
             card.appendChild(details);
         }
+
+        // Publish to Social (only when caught and has a photo)
+        const actionWrap = document.createElement('div');
+        actionWrap.className = 'card-action';
+        if (record.caught && record.img) {
+            if (isPublishedPost(key)) {
+                const pub = document.createElement('div');
+                pub.className = 'published-label';
+                pub.textContent = '✓ Published to Social';
+                actionWrap.appendChild(pub);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = 'publish-btn';
+                btn.textContent = 'Publish to Social';
+                btn.onclick = () => publishCatch(key);
+                actionWrap.appendChild(btn);
+            }
+        }
+        card.appendChild(actionWrap);
 
         fragment.appendChild(card);
     });
@@ -16142,6 +16650,7 @@ function importData(event) {
                 saveStorage();
                 render();
                 checkAchievements(true);
+                updateLevel(false);
                 alert('Data imported successfully!');
             } else {
                 alert('Invalid JSON structure.');
@@ -16160,13 +16669,20 @@ function resetCaught() {
         render();
         unlockedAchievements = new Set();
         checkAchievements(false);
+        updateLevel(false);
     }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     loadStorage();
+    loadFeed();
     render();
     checkAchievements(false);
+    // Establish the level baseline without firing toasts on first load.
+    const info = getLevelInfo(getTotalXp());
+    lastLevel = info.level;
+    lastTotalXp = info.totalXp;
+    renderLevelPanel();
 });
 </script>
 </body>
