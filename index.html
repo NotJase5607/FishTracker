@@ -380,7 +380,11 @@
     }
     .social-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
     .social-title { font-size: 25px; font-weight: 900; }
-    .social-subtitle { color: #afd0d8; font-size: 13px; margin-bottom: 18px; }
+    .social-top-btns { display: flex; gap: 8px; }
+    .social-subtitle { color: #afd0d8; font-size: 13px; margin-bottom: 14px; }
+    .social-live { font-size: 12px; font-weight: 700; margin-bottom: 14px; padding: 6px 10px; border-radius: 8px; background: #0b332b; display: inline-block; }
+    .social-live.on { color: #56e0ad; }
+    .social-live.off { color: #f0c060; background: #3d3a14; }
 
     .feed-list { display: flex; flex-direction: column; gap: 16px; }
     .feed-card {
@@ -673,8 +677,12 @@
         <div class="social-box">
             <div class="social-top">
                 <div class="social-title">Social Feed</div>
-                <button class="secondary" onclick="closeSocial()">Close</button>
+                <div class="social-top-btns">
+                    <button class="secondary" onclick="refreshFeed(); return false;">⟳ Refresh</button>
+                    <button class="secondary" onclick="closeSocial()">Close</button>
+                </div>
             </div>
+            <div id="socialLive" class="social-live off">● Connecting…</div>
             <div id="socialSummary" class="social-subtitle">0 catches in the feed</div>
             <div id="feedList" class="feed-list"></div>
             <div id="feedEmpty" class="empty-feed">
@@ -15919,7 +15927,26 @@ function showLevelToast(level) {
 let socialPosts = [];
 let socialToastTimer = null;
 
-function loadFeed() {
+/* --- Supabase config (set these up, see the setup steps) --- */
+const SUPABASE_URL = "https://jlsbeaaseoitsrnbuipx.supabase.co";       // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsc2JlYWFzZW9pdHNybmJ1aXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNDQ4MDIsImV4cCI6MjEwMzcyMDgwMn0.GUQuwigLwu4A6W_-Y4Bd8KiaW29jnRyV-AXzb9QF9yk";
+
+function supabaseReady() {
+    return SUPABASE_URL && SUPABASE_ANON_KEY
+        && !SUPABASE_URL.startsWith("YOUR")
+        && !SUPABASE_ANON_KEY.startsWith("YOUR");
+}
+
+function supabaseHeaders() {
+    return {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+    };
+}
+
+function loadFeedCache() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY_FEED);
         if (raw) socialPosts = JSON.parse(raw);
@@ -15929,7 +15956,7 @@ function loadFeed() {
     }
 }
 
-function saveFeed() {
+function saveFeedCache() {
     try {
         localStorage.setItem(STORAGE_KEY_FEED, JSON.stringify(socialPosts));
     } catch (e) {
@@ -15937,11 +15964,90 @@ function saveFeed() {
     }
 }
 
+/* Pull every user's posts from the shared backend table. */
+async function fetchServerFeed() {
+    if (!supabaseReady()) return null;
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/posts?select=*&order=created_at.desc`, {
+            headers: supabaseHeaders()
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const rows = await res.json();
+        return rows.map(r => ({
+            key: r.fish_key,
+            common: r.common,
+            scientific: r.scientific,
+            cat: r.cat,
+            img: r.img,
+            date: r.date || "",
+            location: r.location || "",
+            weight: r.weight || "",
+            length: r.length || "",
+            bait: r.bait || "",
+            notes: r.notes || "",
+            created: new Date(r.created_at).getTime()
+        }));
+    } catch (e) {
+        console.error("Failed to fetch global feed:", e);
+        return null;
+    }
+}
+
+/* Push a new post to the shared backend table. */
+async function pushPostToServer(post) {
+    if (!supabaseReady()) return false;
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/posts`, {
+            method: "POST",
+            headers: supabaseHeaders(),
+            body: JSON.stringify({
+                fish_key: post.key,
+                common: post.common,
+                scientific: post.scientific,
+                cat: post.cat,
+                img: post.img,
+                date: post.date,
+                location: post.location,
+                weight: post.weight,
+                length: post.length,
+                bait: post.bait,
+                notes: post.notes
+            })
+        });
+        return res.ok;
+    } catch (e) {
+        console.error("Failed to push post:", e);
+        return false;
+    }
+}
+
+/* Load: local cache first, then refresh with the global feed. */
+let feedTimer = null;
+
+async function refreshFeed() {
+    const server = await fetchServerFeed();
+    if (server) {
+        socialPosts = server;
+        saveFeedCache();
+        render();
+        renderSocial();
+    }
+    return server;
+}
+
+async function loadFeed() {
+    loadFeedCache();
+    await refreshFeed();
+    // Keep the feed live: re-sync from the global database every 8 seconds.
+    if (feedTimer) clearInterval(feedTimer);
+    feedTimer = setInterval(() => refreshFeed(), 8000);
+}
+
 function isPublishedPost(key) {
     return socialPosts.some(p => p.key === key);
 }
 
-function publishCatch(key) {
+async function publishCatch(key) {
     const record = getFishRecord(key);
     if (!record.caught || !record.img) return;
     const fish = BASE_SPECIES.find(f => getFishKey(f) === key);
@@ -15962,14 +16068,20 @@ function publishCatch(key) {
         created: Date.now()
     };
 
-    // Re-publishing a catch replaces its old post and moves it to the top.
+    // Show instantly, then push to the global feed.
     socialPosts = socialPosts.filter(p => p.key !== key);
     socialPosts.unshift(post);
-    saveFeed();
-
+    saveFeedCache();
     render();
-    renderSocial(); // refresh if the modal is open
-    showSocialToast(`${fish.common} is now on the feed!`);
+    renderSocial();
+
+    const pushed = await pushPostToServer(post);
+    showSocialToast(pushed
+        ? `${fish.common} is now on the feed for everyone!`
+        : supabaseReady()
+            ? `Published locally (couldn't reach the feed server)`
+            : `${fish.common} saved locally — add your Supabase keys to go global.`);
+    if (pushed) refreshFeed();
 }
 
 function timeAgo(ts) {
@@ -15988,7 +16100,14 @@ function renderSocial() {
     const list = document.getElementById("feedList");
     const empty = document.getElementById("feedEmpty");
     const summary = document.getElementById("socialSummary");
+    const live = document.getElementById("socialLive");
     if (!list || !empty || !summary) return;
+
+    if (live) {
+        const on = supabaseReady();
+        live.textContent = on ? "● Live — synced globally" : "○ Offline — saving to your browser only";
+        live.className = "social-live " + (on ? "on" : "off");
+    }
 
     summary.textContent = `${socialPosts.length} catch${socialPosts.length === 1 ? "" : "es"} in the feed`;
     list.innerHTML = "";
@@ -16061,6 +16180,7 @@ function renderSocial() {
 function openSocial() {
     const modal = document.getElementById("socialModal");
     if (!modal) return;
+    refreshFeed();
     renderSocial();
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
