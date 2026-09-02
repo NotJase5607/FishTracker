@@ -507,6 +507,39 @@
 
 
 
+    /* ---- header nav buttons ---- */
+    .header-nav button.navbtn {
+        display: inline-flex; align-items: center; justify-content: center;
+        border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 14px;
+        color: #fff; background: #0e6375; cursor: pointer; font-family: inherit;
+        transition: background .15s ease;
+    }
+    .header-nav button.navbtn:hover { background: #157d92; }
+
+    /* ---- Auth / sign up login ---- */
+    .auth-overlay {
+        position: fixed; inset: 0; z-index: 2000;
+        background: radial-gradient(circle at top left, rgba(17,147,173,.18), transparent 35%), linear-gradient(180deg,#06151d 0%,#09232d 100%);
+        display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .auth-box {
+        width: min(400px, 100%); background: #0a2732; border: 1px solid #2c6070;
+        border-radius: 16px; padding: 26px; box-shadow: 0 14px 50px rgba(0,0,0,.55);
+    }
+    .auth-brand { font-size: 30px; font-weight: 900; text-align: center; }
+    .auth-sub { text-align: center; color: #afd0d8; margin-bottom: 18px; }
+    .auth-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+    .auth-toggle button { flex: 1; border: 0; padding: 10px; border-radius: 8px; font-weight: 800; color: #afd0d8; background: #123b49; cursor: pointer; }
+    .auth-toggle button.on { background: #20c5dd; color: #06151d; }
+    .auth-fields { display: flex; flex-direction: column; gap: 6px; }
+    .auth-fields label { font-size: 12px; font-weight: 800; color: #7fd8e8; margin-top: 6px; }
+    .auth-fields input { padding: 11px 12px; border-radius: 8px; border: 1px solid #2c6070; background: #0d2c18; color: #f5fbff; font-size: 14px; }
+    .auth-fields input:focus { border-color: #20c5dd; outline: none; }
+    .auth-submit { width: 100%; margin-top: 16px; border: 0; padding: 12px; border-radius: 8px; font-weight: 900; font-size: 15px; color: #06151d; background: linear-gradient(90deg, #20c5dd, #53dfa7); cursor: pointer; }
+    .auth-submit:disabled { opacity: .6; cursor: default; }
+    .auth-error { color: #f3a6a6; font-size: 13px; margin-top: 10px; min-height: 18px; }
+    .auth-note { font-size: 12px; color: #7f9ba4; margin-top: 14px; text-align: center; line-height: 1.5; }
+
     /* ---- Achievements ---- */
     .achievements-modal {
         position: fixed;
@@ -680,11 +713,32 @@
     <div class="header-nav">
     <a href="https://notjase5607.github.io/FishTracker/index.html" class="active" role="button">Catalog</a>
     <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
-    <a href="#" role="button" onclick="openAchievements(); return false;">Achievements</a>
-    <a href="#" role="button" onclick="openSocial(); return false;">Social</a>
-    <a href="#" role="button" onclick="openFriends(); return false;">Friends</a>
+    <button type="button" class="navbtn" onclick="openAchievements()">Achievements</button>
+    <button type="button" class="navbtn" onclick="openSocial()">Social</button>
+    <button type="button" class="navbtn" onclick="openFriends()">Friends</button>
 </div>
 </header>
+
+    <!-- Auth / sign up / log in screen -->
+    <div id="authScreen" class="auth-overlay" style="display:none">
+        <div class="auth-box">
+            <div class="auth-brand">🐟 Fish Tracker</div>
+            <div class="auth-sub">The global fishing community</div>
+            <div class="auth-toggle">
+                <button id="authTabLogin" class="on" onclick="switchAuthMode('login')">Log In</button>
+                <button id="authTabSignup" onclick="switchAuthMode('signup')">Sign Up</button>
+            </div>
+            <div class="auth-fields">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email" placeholder="you@email.com" autocomplete="email">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+            </div>
+            <div id="authError" class="auth-error"></div>
+            <button id="authSubmit" class="auth-submit" onclick="submitAuth()">Log In</button>
+            <div class="auth-note">Create an account to publish your fish to the global feed, add friends, and show your profile to the community.</div>
+        </div>
+    </div>
 
 <main class="container">
 
@@ -796,6 +850,7 @@
                         <button class="mini-btn" onclick="saveProfile()">Save</button>
                     </div>
                     <button class="secondary" onclick="openProfilePicMenu()">Set Profile Picture</button>
+                    <button class="secondary" onclick="signOut()">Sign Out</button>
                 </div>
             </div>
 
@@ -16517,6 +16572,7 @@ async function refreshFriends() {
 }
 
 async function startSocialIdentity() {
+    if (!isAuthed()) return; // need an account to join the social layer
     if (!supabaseReady()) { renderFriendsView(); return; }
     registerUser();
     syncUser();
@@ -16728,6 +16784,110 @@ function renderRequests(view) {
         box.appendChild(ok); box.appendChild(no);
         view.appendChild(makeUserRow(u, box));
     });
+}
+
+
+/* ============ Auth (Sign up / Log in) ============ */
+
+const STORAGE_KEY_AUTH = "fish_tracker_auth_v1";
+let authSession = null;
+let authMode = "login";
+
+function loadAuthSession() {
+    try { const raw = localStorage.getItem(STORAGE_KEY_AUTH); if (raw) authSession = JSON.parse(raw); } catch (e) { authSession = null; }
+    return authSession;
+}
+function saveAuthSession(s) { authSession = s; try { localStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(s)); } catch (e) {} }
+function clearAuthSession() { authSession = null; try { localStorage.removeItem(STORAGE_KEY_AUTH); } catch (e) {} }
+function isAuthed() { return !!(authSession && authSession.accessToken); }
+
+function authApiHeaders(token) {
+    const h = { "apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json" };
+    if (token) h["Authorization"] = "Bearer " + token;
+    return h;
+}
+
+async function authSignUp(email, password) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        method: "POST", headers: authApiHeaders(), body: JSON.stringify({ email, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data.access_token && data.user) return { ok: true, session: { accessToken: data.access_token, refreshToken: data.refresh_token, user: data.user } };
+    return { ok: false, error: (data.msg || data.error_description || "Sign up failed. Please try again.") };
+}
+
+async function authLogIn(email, password) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST", headers: authApiHeaders(), body: JSON.stringify({ email, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data.access_token && data.user) return { ok: true, session: { accessToken: data.access_token, refreshToken: data.refresh_token, user: data.user } };
+    return { ok: false, error: data.error_description || data.msg || "Invalid email or password." };
+}
+
+async function authValidateToken(token) {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: authApiHeaders(token) });
+        if (!res.ok) return false;
+        return await res.json();
+    } catch (e) { return false; }
+}
+
+function showAuthScreen() { const s = document.getElementById("authScreen"); if (s) s.style.display = "flex"; }
+function hideAuthScreen() { const s = document.getElementById("authScreen"); if (s) s.style.display = "none"; }
+
+function switchAuthMode(mode) {
+    authMode = mode;
+    const tl = document.getElementById("authTabLogin");
+    const ts = document.getElementById("authTabSignup");
+    const sb = document.getElementById("authSubmit");
+    if (tl) tl.classList.toggle("on", mode === "login");
+    if (ts) ts.classList.toggle("on", mode === "signup");
+    if (sb) sb.textContent = mode === "login" ? "Log In" : "Sign Up";
+    const err = document.getElementById("authError"); if (err) err.textContent = "";
+}
+
+async function submitAuth() {
+    const email = document.getElementById("authEmail").value.trim();
+    const pass = document.getElementById("authPassword").value;
+    const err = document.getElementById("authError");
+    const btn = document.getElementById("authSubmit");
+    if (!email || !pass) { if (err) err.textContent = "Please enter your email and password."; return; }
+    if (authMode === "signup" && pass.length < 6) { if (err) err.textContent = "Password must be at least 6 characters."; return; }
+    if (btn) btn.disabled = true;
+    const res = (authMode === "signup") ? await authSignUp(email, pass) : await authLogIn(email, pass);
+    if (btn) btn.disabled = false;
+    if (res.ok) {
+        applyAuthSession(res.session);
+    } else {
+        if (err) err.textContent = res.error;
+    }
+}
+
+function applyAuthSession(session) {
+    saveAuthSession(session);
+    const prev = getUserProfile();
+    myUser = { id: session.user.id, name: prev.name || "", avatar: prev.avatar || "" };
+    try { localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(myUser)); } catch (e) {}
+    hideAuthScreen();
+    startSocialIdentity();
+    refreshFeed();
+}
+
+async function initAuth() {
+    const s = loadAuthSession();
+    if (s && s.accessToken) {
+        const user = await authValidateToken(s.accessToken);
+        if (user) { applyAuthSession({ accessToken: s.accessToken, refreshToken: s.refreshToken, user }); return; }
+    }
+    showAuthScreen();
+}
+
+function signOut() {
+    clearAuthSession();
+    myUser = null;
+    try { localStorage.removeItem(STORAGE_KEY_USER); } catch (e) {}
+    location.reload();
 }
 
 
@@ -17331,7 +17491,7 @@ function resetCaught() {
 window.addEventListener('DOMContentLoaded', () => {
     loadStorage();
     loadFeed();
-    startSocialIdentity();
+    initAuth();
     render();
     checkAchievements(false);
     // Establish the level baseline without firing toasts on first load.
