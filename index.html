@@ -424,6 +424,87 @@
         font-weight: 800; font-size: 13px; color: #56e0ad;
         background: #0b332b; border: 1px solid #1ca778;
     }
+    .card-actions-row { display: flex; gap: 8px; margin-top: 10px; }
+    .card-actions-row > * { flex: 1; }
+    .remove-post-btn {
+        width: 100%; border: 1px solid #8b3232; border-radius: 8px; padding: 10px 14px;
+        font-weight: 800; color: #f3a6a6; background: #2a1414; cursor: pointer;
+        transition: background .15s;
+    }
+    .remove-post-btn:hover { background: #8b3232; color: #fff; }
+
+    /* ---- Feed author row ---- */
+    .feed-author {
+        display: flex; align-items: center; gap: 8px; margin: 8px 0 2px;
+    }
+    .author-avatar {
+        width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
+        background: #123b47; color: #bde6ed; display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 800; background-size: cover; background-position: center; overflow: visible;
+    }
+    .author-name { font-size: 13px; font-weight: 800; color: #bde6ed; }
+    .author-me { font-size: 11px; color: #56e0ad; font-weight: 800; }
+    .post-remove-btn {
+        margin-left: auto; border: 1px solid #8b3232; background: transparent;
+        color: #f3a6a6; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .post-remove-btn:hover { background: #8b3232; color: #fff; }
+
+    /* ---- Friends / profile ---- */
+    .friend-profile {
+        display: flex; gap: 14px; align-items: center; padding: 14px;
+        background: #08212c; border: 1px solid #1a4653; border-radius: 12px; margin-bottom: 12px;
+    }
+    .avatar {
+        width: 64px; height: 64px; min-width: 64px; border-radius: 50%;
+        background: #123b47; color: #bde6ed; display: flex; align-items: center; justify-content: center;
+        font-size: 26px; font-weight: 900; background-size: cover; background-position: center;
+        border: 2px solid #2c6070; overflow: hidden; position: relative;
+    }
+    .avatar.no-img { background: #123b47; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-fields { flex: 1; min-width: 0; }
+    .profile-label { font-size: 11px; font-weight: 800; color: #7fd8e8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+    .profile-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .profile-row input { flex: 1; min-width: 0; }
+    .mini-btn {
+        border: 0; border-radius: 8px; padding: 8px 12px; font-weight: 800; color: #06151d;
+        background: #20c5dd; cursor: pointer; white-space: nowrap; transition: filter .12s;
+    }
+    .mini-btn:hover { filter: brightness(1.1); }
+    .mini-btn.danger { background: #8b3232; color: #fff; }
+    .mini-btn.ghost { background: #1b4b5b; color: #fff; }
+
+    .friend-tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .friend-tabs button {
+        flex: 1; min-width: 90px; border: 0; border-radius: 8px; padding: 9px 10px;
+        font-weight: 800; color: #afd0d8; background: #123b49; cursor: pointer;
+    }
+    .friend-tabs button.on { background: #20c5dd; color: #06151d; }
+
+    .friend-view { display: flex; flex-direction: column; gap: 8px; }
+    .friend-empty { text-align: center; padding: 30px; opacity: .7; color: #afd0d8; }
+    .user-row {
+        display: flex; align-items: center; gap: 10px; padding: 10px;
+        background: #08212c; border: 1px solid #1a4653; border-radius: 10px;
+    }
+    .user-avatar {
+        width: 40px; height: 40px; min-width: 40px; border-radius: 50%;
+        background: #123b47; color: #bde6ed; display: flex; align-items: center; justify-content: center;
+        font-size: 16px; font-weight: 900; background-size: cover; background-position: center; position: relative;
+    }
+    .online-dot {
+        position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%;
+        background: #6b7d85; border: 2px solid #08212c;
+    }
+    .online-dot.on { background: #2ecc71; }
+    .user-name { flex: 1; min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-you { font-size: 11px; color: #56e0ad; font-weight: 800; }
+    .status-pill { font-size: 12px; font-weight: 800; color: #56e0ad; white-space: nowrap; }
+    .status-pill.warn { color: #f0c060; }
+
+    .social-box.small { max-width: 380px; }
+
 
 
     /* ---- Achievements ---- */
@@ -601,6 +682,7 @@
     <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
     <a href="#" role="button" onclick="openAchievements(); return false;">Achievements</a>
     <a href="#" role="button" onclick="openSocial(); return false;">Social</a>
+    <a href="#" role="button" onclick="openFriends(); return false;">Friends</a>
 </div>
 </header>
 
@@ -695,6 +777,55 @@
     <div id="achievementToast" class="achievement-toast">
         <div class="achievement-toast-title">Achievement Unlocked!</div>
         <div id="achievementToastName" class="achievement-toast-name"></div>
+    </div>
+
+    <!-- Friends modal -->
+    <div id="friendsModal" class="social-modal" style="display:none" onclick="if(event.target===this) closeFriends()">
+        <div class="social-box">
+            <div class="social-top">
+                <div class="social-title">Friends</div>
+                <button class="secondary" onclick="closeFriends()">Close</button>
+            </div>
+
+            <div class="friend-profile">
+                <div id="myAvatarBox" class="avatar no-img" onclick="openProfilePicMenu()"><span id="myAvatarText">?</span></div>
+                <div class="profile-fields">
+                    <div class="profile-label">Set Username</div>
+                    <div class="profile-row">
+                        <input id="myUsername" type="text" placeholder="Type your name" maxlength="24">
+                        <button class="mini-btn" onclick="saveProfile()">Save</button>
+                    </div>
+                    <button class="secondary" onclick="openProfilePicMenu()">Set Profile Picture</button>
+                </div>
+            </div>
+
+            <div class="friend-tabs">
+                <button id="tab-friends" class="on" onclick="switchFriendView('friends')">Friends</button>
+                <button id="tab-add" onclick="switchFriendView('add')">Add Friends</button>
+                <button id="tab-requests" onclick="switchFriendView('requests')">Friend Requests</button>
+            </div>
+
+            <div id="friendView" class="friend-view"></div>
+        </div>
+    </div>
+
+    <!-- Profile picture chooser -->
+    <div id="profilePicMenu" class="social-modal" style="display:none" onclick="if(event.target===this) closeProfilePicMenu()">
+        <div class="social-box small">
+            <div class="social-title" style="margin-bottom:14px">Set Profile Picture</div>
+            <div style="display:flex;gap:10px;flex-direction:column">
+                <button class="secondary" onclick="document.getElementById('avatarCapture').click()">Take Now (camera)</button>
+                <button class="secondary" onclick="document.getElementById('avatarUpload').click()">Upload from Device</button>
+                <button class="secondary" onclick="closeProfilePicMenu()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="avatarCapture" accept="image/*" capture="user" style="display:none" onchange="profilePicFromFile(this.files[0])">
+    <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="profilePicFromFile(this.files[0])">
+
+    <div id="genericToast" class="achievement-toast">
+        <div class="achievement-toast-title">Fish Tracker</div>
+        <div id="genericToastName" class="achievement-toast-name"></div>
     </div>
 
     <div id="levelToast" class="level-toast">
@@ -15792,6 +15923,8 @@ function closeAchievements() {
 document.addEventListener("keydown", e => {
     if (e.key === "Escape") closeAchievements();
     if (e.key === "Escape") closeSocial();
+    if (e.key === "Escape") closeFriends();
+    if (e.key === "Escape") closeProfilePicMenu();
 });
 
 
@@ -15974,6 +16107,7 @@ async function fetchServerFeed() {
         if (!res.ok) throw new Error("HTTP " + res.status);
         const rows = await res.json();
         return rows.map(r => ({
+            id: r.id,
             key: r.fish_key,
             common: r.common,
             scientific: r.scientific,
@@ -15985,6 +16119,8 @@ async function fetchServerFeed() {
             length: r.length || "",
             bait: r.bait || "",
             notes: r.notes || "",
+            author_id: r.author_id || "",
+            author_name: r.author_name || "",
             created: new Date(r.created_at).getTime()
         }));
     } catch (e) {
@@ -16011,7 +16147,9 @@ async function pushPostToServer(post) {
                 weight: post.weight,
                 length: post.length,
                 bait: post.bait,
-                notes: post.notes
+                notes: post.notes,
+                author_id: getUserProfile().id,
+                author_name: getUserProfile().name || ""
             })
         });
         return res.ok;
@@ -16047,6 +16185,27 @@ function isPublishedPost(key) {
     return socialPosts.some(p => p.key === key);
 }
 
+async function removePost(post) {
+    if (supabaseReady() && post.id) {
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${encodeURIComponent(post.id)}`, {
+                method: "DELETE",
+                headers: supabaseHeaders()
+            });
+        } catch (e) {}
+    }
+    socialPosts = socialPosts.filter(p => p.key !== post.key);
+    saveFeedCache();
+    render();
+    renderSocial();
+    showSocialToast("Post removed from the feed");
+}
+
+function removeCatchPost(key) {
+    const post = socialPosts.find(p => p.key === key);
+    if (post) removePost(post);
+}
+
 async function publishCatch(key) {
     const record = getFishRecord(key);
     if (!record.caught || !record.img) return;
@@ -16065,6 +16224,8 @@ async function publishCatch(key) {
         length: record.length || "",
         bait: record.bait || "",
         notes: record.notes || "",
+        author_id: getUserProfile().id,
+        author_name: getUserProfile().name || "",
         created: Date.now()
     };
 
@@ -16147,6 +16308,30 @@ function renderSocial() {
         header.appendChild(time);
         card.appendChild(header);
 
+        // Author row
+        const author = document.createElement("div");
+        author.className = "feed-author";
+        const av = document.createElement("div");
+        av.className = "author-avatar";
+        av.textContent = (post.author_name || "A").charAt(0).toUpperCase();
+        const nm = document.createElement("div");
+        nm.className = "author-name";
+        nm.textContent = post.author_name ? post.author_name : "Anonymous";
+        author.appendChild(av);
+        author.appendChild(nm);
+        if (post.author_id && post.author_id === getUserProfile().id) {
+            const meTag = document.createElement("div");
+            meTag.className = "author-me";
+            meTag.textContent = "you";
+            author.appendChild(meTag);
+            const rm = document.createElement("button");
+            rm.className = "post-remove-btn";
+            rm.textContent = "Remove";
+            rm.onclick = () => removePost(post);
+            author.appendChild(rm);
+        }
+        card.appendChild(author);
+
         const img = document.createElement("img");
         img.src = post.img;
         img.alt = post.common;
@@ -16201,6 +16386,348 @@ function showSocialToast(message) {
     toast.classList.add("show");
     clearTimeout(socialToastTimer);
     socialToastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+
+/* ============ Identity & Friends ============ */
+
+const STORAGE_KEY_USER = "fish_tracker_user_v1";
+let myUser = null;
+let friends = [];
+let friendships = [];
+let friendView = "friends";
+let friendsTimer = null;
+let genericToastTimer = null;
+
+function getUserProfile() {
+    if (myUser) return myUser;
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY_USER);
+        if (raw) myUser = JSON.parse(raw);
+    } catch (e) {}
+    if (!myUser || !myUser.id) {
+        const id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "u" + Date.now() + Math.random().toString(16).slice(2);
+        myUser = { id, name: "", avatar: "" };
+        try { localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(myUser)); } catch (e) {}
+    }
+    return myUser;
+}
+
+function saveUserProfile() {
+    try { localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(myUser)); } catch (e) {}
+}
+
+function userName(user) {
+    return (user && user.name && user.name.trim()) ? user.name : "Anonymous";
+}
+
+function isOnlineUser(user) {
+    return user && user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 60000;
+}
+
+function showToast(message) {
+    const toast = document.getElementById("genericToast");
+    const name = document.getElementById("genericToastName");
+    if (!toast || !name) return;
+    name.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(genericToastTimer);
+    genericToastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+/* ---- User sync + heartbeat (keeps you online) ---- */
+async function registerUser() {
+    if (!supabaseReady()) return;
+    const u = getUserProfile();
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+            method: "POST", headers: supabaseHeaders(),
+            body: JSON.stringify({ id: u.id, name: u.name || null, avatar: u.avatar || null })
+        });
+    } catch (e) {}
+}
+
+async function syncUser() {
+    if (!supabaseReady()) return;
+    const u = getUserProfile();
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${encodeURIComponent(u.id)}`, {
+            method: "PATCH", headers: supabaseHeaders(),
+            body: JSON.stringify({ name: u.name || null, avatar: u.avatar || null, last_seen: new Date().toISOString() })
+        });
+    } catch (e) {}
+}
+
+async function fetchUsers() {
+    if (!supabaseReady()) return [];
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/users?select=id,name,avatar,last_seen&order=created_at.asc`, { headers: supabaseHeaders() });
+        if (!res.ok) return [];
+        return await res.json();
+    } catch (e) { return []; }
+}
+
+async function fetchFriendships() {
+    if (!supabaseReady()) return [];
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/friendships?select=*`, { headers: supabaseHeaders() });
+        if (!res.ok) return [];
+        return await res.json();
+    } catch (e) { return []; }
+}
+
+function myFriendshipWith(userId) {
+    const me = getUserProfile().id;
+    return friendships.find(f =>
+        (f.requester_id === me && f.addressee_id === userId) ||
+        (f.addressee_id === me && f.requester_id === userId)
+    );
+}
+
+async function sendFriendRequest(toId) {
+    if (!supabaseReady()) { showToast("Friendship needs the live backend (Supabase) to be connected."); return; }
+    const me = getUserProfile().id;
+    if (toId === me) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/friendships`, {
+            method: "POST", headers: supabaseHeaders(),
+            body: JSON.stringify({ requester_id: me, addressee_id: toId, status: "pending" })
+        });
+        await refreshFriends();
+    } catch (e) {}
+}
+
+async function respondFriendRequest(fid, status) {
+    if (!supabaseReady()) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/friendships?id=eq.${fid}`, {
+            method: "PATCH", headers: supabaseHeaders(),
+            body: JSON.stringify({ status: status, responded_at: new Date().toISOString() })
+        });
+        await refreshFriends();
+    } catch (e) {}
+}
+
+async function refreshFriends() {
+    if (!supabaseReady()) { renderFriendsView(); return; }
+    const res = await Promise.all([fetchUsers(), fetchFriendships()]);
+    friends = res[0] || [];
+    friendships = res[1] || [];
+    renderFriendsView();
+}
+
+async function startSocialIdentity() {
+    if (!supabaseReady()) { renderFriendsView(); return; }
+    registerUser();
+    syncUser();
+    setInterval(syncUser, 15000); // heartbeat -> shows as online
+    await refreshFriends();
+    if (friendsTimer) clearInterval(friendsTimer);
+    friendsTimer = setInterval(refreshFriends, 10000);
+}
+
+/* ---- Friends modal ---- */
+function openFriends() {
+    const modal = document.getElementById("friendsModal");
+    if (!modal) return;
+    friendView = "friends";
+    fillProfileFields();
+    refreshFriends();
+    renderFriendsView();
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function closeFriends() {
+    const modal = document.getElementById("friendsModal");
+    if (!modal) return;
+    modal.style.display = "none";
+    document.body.style.overflow = "";
+}
+
+function switchFriendView(view) {
+    friendView = view;
+    refreshFriends();
+    renderFriendsView();
+}
+
+/* ---- Profile ---- */
+function fillProfileFields() {
+    const u = getUserProfile();
+    const input = document.getElementById("myUsername");
+    const box = document.getElementById("myAvatarBox");
+    const txt = document.getElementById("myAvatarText");
+    if (input) input.value = u.name || "";
+    if (box && txt) {
+        if (u.avatar) {
+            box.style.backgroundImage = `url(${u.avatar})`;
+            box.style.backgroundSize = "cover";
+            box.style.backgroundPosition = "center";
+            box.classList.remove("no-img");
+            txt.textContent = "";
+        } else {
+            box.style.backgroundImage = "";
+            box.classList.add("no-img");
+            txt.textContent = (u.name || "?").charAt(0).toUpperCase();
+        }
+    }
+}
+
+function saveProfile() {
+    const input = document.getElementById("myUsername");
+    if (!input) return;
+    const u = getUserProfile();
+    u.name = input.value.trim();
+    saveUserProfile();
+    syncUser();
+    fillProfileFields();
+    showToast(u.name ? `Username saved as "${u.name}"` : "Username cleared");
+}
+
+function openProfilePicMenu() {
+    const m = document.getElementById("profilePicMenu");
+    if (m) m.style.display = "flex";
+}
+function closeProfilePicMenu() {
+    const m = document.getElementById("profilePicMenu");
+    if (m) m.style.display = "none";
+}
+
+function profilePicFromFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        setAvatarFromData(e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+function setAvatarFromData(data) {
+    const img = new Image();
+    img.onload = function () {
+        const size = 256;
+        const c = document.createElement("canvas");
+        c.width = size; c.height = size;
+        const ctx = c.getContext("2d");
+        const min = Math.min(img.width, img.height);
+        const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+        ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+        const u = getUserProfile();
+        u.avatar = c.toDataURL("image/jpeg", 0.85);
+        saveUserProfile();
+        syncUser();
+        fillProfileFields();
+        closeProfilePicMenu();
+        showToast("Profile picture updated");
+    };
+    img.src = data;
+}
+
+/* ---- Render friend views ---- */
+function renderFriendsView() {
+    const view = document.getElementById("friendView");
+    if (!view) return;
+    const t1 = document.getElementById("tab-friends");
+    const t2 = document.getElementById("tab-add");
+    const t3 = document.getElementById("tab-requests");
+    if (t1) t1.classList.toggle("on", friendView === "friends");
+    if (t2) t2.classList.toggle("on", friendView === "add");
+    if (t3) t3.classList.toggle("on", friendView === "requests");
+    view.innerHTML = "";
+    if (friendView === "add") renderAddPeople(view);
+    else if (friendView === "requests") renderRequests(view);
+    else renderFriends(view);
+}
+
+function makeUserRow(user, actionEl) {
+    const row = document.createElement("div");
+    row.className = "user-row";
+    const av = document.createElement("div");
+    av.className = "user-avatar";
+    if (user.avatar) {
+        av.style.backgroundImage = `url(${user.avatar})`;
+        av.style.backgroundSize = "cover";
+        av.style.backgroundPosition = "center";
+    } else {
+        av.textContent = (userName(user) || "?").charAt(0).toUpperCase();
+    }
+    const dot = document.createElement("span");
+    dot.className = "online-dot" + (isOnlineUser(user) ? " on" : "");
+    av.appendChild(dot);
+    const nm = document.createElement("div");
+    nm.className = "user-name";
+    nm.textContent = userName(user);
+    row.appendChild(av);
+    row.appendChild(nm);
+    if (actionEl) row.appendChild(actionEl);
+    return row;
+}
+
+function emptyView(view, text) {
+    const d = document.createElement("div");
+    d.className = "friend-empty";
+    d.textContent = text;
+    view.appendChild(d);
+}
+
+function renderFriends(view) {
+    const me = getUserProfile().id;
+    const ids = new Set();
+    friendships.forEach(f => {
+        if (f.status === "accepted") {
+            if (f.requester_id === me) ids.add(f.addressee_id);
+            if (f.addressee_id === me) ids.add(f.requester_id);
+        }
+    });
+    const list = friends.filter(u => ids.has(u.id));
+    if (list.length === 0) { emptyFriend(view, "No friends yet. Use 'Add Friends' to find other anglers."); return; }
+    list.forEach(u => view.appendChild(makeUserRow(u)));
+}
+
+function addFriendBtn(user) {
+    const b = document.createElement("button");
+    b.className = "mini-btn";
+    b.textContent = "Add Friend";
+    b.onclick = () => sendFriendRequest(user.id);
+    return b;
+}
+
+function renderAddPeople(view) {
+    const me = getUserProfile().id;
+    const people = friends.filter(u => u.id !== me);
+    if (people.length === 0) { emptyFriend(view, "No other anglers on the site yet. Set your username & profile above so others can find you."); return; }
+    people.forEach(u => {
+        const f = myFriendshipWith(u.id);
+        let actionEl = null;
+        if (f && f.status === "accepted") {
+            const p = document.createElement("span"); p.className = "status-pill"; p.textContent = "✓ Friends"; actionEl = p;
+        } else if (f && f.status === "pending" && f.requester_id === me) {
+            const p = document.createElement("span"); p.className = "status-pill warn"; p.textContent = "Request sent"; actionEl = p;
+        } else if (f && f.status === "pending" && f.addressee_id === me) {
+            const box = document.createElement("div"); box.style.display = "flex"; box.style.gap = "6px";
+            const ok = document.createElement("button"); ok.className = "mini-btn"; ok.textContent = "Accept"; ok.onclick = () => respondFriendRequest(f.id, "accepted");
+            const no = document.createElement("button"); no.className = "mini-btn danger"; no.textContent = "Decline"; no.onclick = () => respondFriendRequest(f.id, "declined");
+            box.appendChild(ok); box.appendChild(no); actionEl = box;
+        } else {
+            actionEl = addFriendBtn(u);
+        }
+        view.appendChild(makeUserRow(u, actionEl));
+    });
+}
+
+function renderRequests(view) {
+    const me = getUserProfile().id;
+    const pending = friendships.filter(f => f.status === "pending" && f.addressee_id === me);
+    if (pending.length === 0) { emptyFriend(view, "No friend requests right now."); return; }
+    pending.forEach(f => {
+        const u = friends.find(x => x.id === f.requester_id);
+        if (!u) return;
+        const box = document.createElement("div"); box.style.display = "flex"; box.style.gap = "6px";
+        const ok = document.createElement("button"); ok.className = "mini-btn"; ok.textContent = "Accept"; ok.onclick = () => respondFriendRequest(f.id, "accepted");
+        const no = document.createElement("button"); no.className = "mini-btn danger"; no.textContent = "Decline"; no.onclick = () => respondFriendRequest(f.id, "declined");
+        box.appendChild(ok); box.appendChild(no);
+        view.appendChild(makeUserRow(u, box));
+    });
 }
 
 
@@ -16727,10 +17254,18 @@ function render() {
         actionWrap.className = 'card-action';
         if (record.caught && record.img) {
             if (isPublishedPost(key)) {
+                const row = document.createElement('div');
+                row.className = 'card-actions-row';
                 const pub = document.createElement('div');
                 pub.className = 'published-label';
                 pub.textContent = '✓ Published to Social';
-                actionWrap.appendChild(pub);
+                const rm = document.createElement('button');
+                rm.className = 'remove-post-btn';
+                rm.textContent = 'Remove from Social';
+                rm.onclick = () => removeCatchPost(key);
+                row.appendChild(pub);
+                row.appendChild(rm);
+                actionWrap.appendChild(row);
             } else {
                 const btn = document.createElement('button');
                 btn.className = 'publish-btn';
@@ -16796,6 +17331,7 @@ function resetCaught() {
 window.addEventListener('DOMContentLoaded', () => {
     loadStorage();
     loadFeed();
+    startSocialIdentity();
     render();
     checkAchievements(false);
     // Establish the level baseline without firing toasts on first load.
