@@ -17350,6 +17350,21 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<style id="nj-admin-style">
+#njAdminBar{display:none;position:fixed;left:50%;top:14px;transform:translateX(-50%);width:min(760px,calc(100% - 28px));z-index:100000;background:#07151b;border:1px solid #d7ad3d;border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.65);overflow:hidden;font-family:Arial,Helvetica,sans-serif}
+#njAdminBar.open{display:block}
+.nj-admin-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:linear-gradient(90deg,#3a2d08,#18221c);border-bottom:1px solid #5e5124}.nj-admin-title{font-weight:900;color:#ffd75e}.nj-admin-close{border:0;background:transparent;color:#b9cbd0;font-size:20px;cursor:pointer}.nj-admin-body{padding:12px}.nj-admin-line{display:flex;gap:8px;align-items:center}.nj-admin-prompt{color:#ffd75e;font-weight:900}.nj-admin-input{flex:1;background:#02090c;border:1px solid #31515b;border-radius:8px;color:#fff;padding:11px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.nj-admin-input:focus{border-color:#ffd75e}.nj-admin-output{max-height:240px;overflow:auto;margin-top:10px;padding:10px;background:#02090c;border-radius:8px;color:#cfe6eb;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}.nj-admin-help{margin-top:8px;color:#819aa3;font-size:11px}.nj-admin-cmd{color:#ffd75e}
+</style>
+<div id="njAdminBar" aria-hidden="true">
+  <div class="nj-admin-head"><div class="nj-admin-title">⚡ NJ OWNER ADMIN</div><button class="nj-admin-close" id="njAdminClose" type="button">×</button></div>
+  <div class="nj-admin-body">
+    <div class="nj-admin-line"><span class="nj-admin-prompt">&gt;</span><input id="njAdminInput" class="nj-admin-input" autocomplete="off" spellcheck="false" placeholder="Type /commands"></div>
+    <div id="njAdminOutput" class="nj-admin-output">Type /commands to see available commands.</div>
+    <div class="nj-admin-help">Press <b>/</b> to open • Enter to run • Esc to close</div>
+  </div>
+</div>
+
 <style id="nj-auth-style">
 #njAuthGate{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at top,#123b49 0,#061821 55%,#030c10 100%);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
 #njAuthGate.nj-hidden{display:none}
@@ -17428,6 +17443,110 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindFriends);
   else bindFriends();
+})();
+</script>
+
+<script id="nj-owner-admin">
+(function(){
+  const OWNER_NAME = "NotJase (Owner)";
+  const bar = document.getElementById("njAdminBar");
+  const input = document.getElementById("njAdminInput");
+  const output = document.getElementById("njAdminOutput");
+  const close = document.getElementById("njAdminClose");
+  let isOwner = false;
+
+  function profileName(){
+    try {
+      if (typeof getUserProfile === "function") return String((getUserProfile()||{}).name||"").trim();
+    } catch(e){}
+    try { return String((JSON.parse(localStorage.getItem("fish_tracker_user_v1"))||{}).name||"").trim(); } catch(e){ return ""; }
+  }
+  function checkOwner(){ isOwner = profileName() === OWNER_NAME; return isOwner; }
+  function log(text, cls){ const line=document.createElement("div"); if(cls) line.className=cls; line.textContent=text; output.appendChild(line); output.scrollTop=output.scrollHeight; }
+  function clearLog(){output.textContent="";}
+  function open(){
+    if(!checkOwner()) return;
+    bar.classList.add("open"); bar.setAttribute("aria-hidden","false"); input.value=""; input.focus();
+  }
+  function closeBar(){bar.classList.remove("open");bar.setAttribute("aria-hidden","true");}
+  function headers(){ return {"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json","Prefer":"return=minimal"}; }
+  async function getUsersByName(name){
+    const url=SUPABASE_URL+"/rest/v1/users?select=id,name&name=eq."+encodeURIComponent(name)+"&limit=10";
+    const r=await fetch(url,{headers:headers()}); if(!r.ok) throw new Error("Could not read users (HTTP "+r.status+")"); return await r.json();
+  }
+  function levelToXp(level){
+    level=Math.max(1,Math.floor(Number(level)||1)); let xp=0; for(let l=1;l<level;l++) xp += 100 + (l-1)*40; return xp;
+  }
+  async function removeAcc(name){
+    const users=await getUsersByName(name); if(!users.length) throw new Error("User not found: "+name);
+    if(users.length>1) throw new Error("More than one user has that username. Rename duplicates first.");
+    const id=users[0].id;
+    const urls=[SUPABASE_URL+"/rest/v1/friendships?requester_id=eq."+encodeURIComponent(id),SUPABASE_URL+"/rest/v1/friendships?addressee_id=eq."+encodeURIComponent(id)];
+    const rs=await Promise.all(urls.map(u=>fetch(u,{method:"DELETE",headers:headers()})));
+    if(rs.some(r=>!r.ok)) throw new Error("The friendships could not be removed. Check your Supabase DELETE policy on friendships.");
+    return "Removed "+name+" from the friends system for everyone.";
+  }
+  async function setXp(name,xp){
+    const users=await getUsersByName(name); if(!users.length) throw new Error("User not found: "+name); if(users.length>1) throw new Error("More than one user has that username.");
+    const r=await fetch(SUPABASE_URL+"/rest/v1/users?id=eq."+encodeURIComponent(users[0].id),{method:"PATCH",headers:headers(),body:JSON.stringify({xp:Math.max(0,Math.floor(xp))})});
+    if(!r.ok) throw new Error("Could not save XP (HTTP "+r.status+"). Add an integer xp column to users and allow the update in Supabase RLS.");
+    return users[0];
+  }
+  async function currentXp(name){
+    const users=await getUsersByName(name); if(!users.length) throw new Error("User not found: "+name); if(users.length>1) throw new Error("More than one user has that username.");
+    const r=await fetch(SUPABASE_URL+"/rest/v1/users?select=id,xp&id=eq."+encodeURIComponent(users[0].id));
+    if(!r.ok) throw new Error("Could not read XP. Add an integer xp column to users.");
+    const rows=await r.json(); return Number(rows[0]?.xp||0);
+  }
+  async function runCommand(raw){
+    const line=raw.trim(); if(!line)return;
+    log("> "+line);
+    const parts=line.split(/\s+/); const cmd=(parts[0]||"").toLowerCase();
+    try{
+      if(cmd==="/commands"||cmd==="commands"){
+        log("Available commands:"); log("/removeacc (username)"); log("  Removes that user's friendships for everyone."); log("/setlevel (username) (value)"); log("  Sets their XP to the beginning of that level."); log("/givexp (username) (value)"); log("  Adds XP to their current global XP."); return;
+      }
+      if(cmd==="/removeacc"){
+        if(parts.length<2) throw new Error("Usage: /removeacc (username)");
+        const name=line.slice(cmd.length).trim(); if(name===OWNER_NAME) throw new Error("You cannot remove the owner.");
+        log(await removeAcc(name)); return;
+      }
+      if(cmd==="/setlevel"){
+        if(parts.length<3) throw new Error("Usage: /setlevel (username) (value)");
+        const value=Number(parts[parts.length-1]); const name=parts.slice(1,-1).join(" "); if(!Number.isInteger(value)||value<1||value>100000) throw new Error("Level must be a whole number from 1 to 100000.");
+        const xp=levelToXp(value); await setXp(name,xp); log("Set "+name+" to level "+value+" ("+xp+" XP)."); return;
+      }
+      if(cmd==="/givexp"){
+        if(parts.length<3) throw new Error("Usage: /givexp (username) (value)");
+        const value=Number(parts[parts.length-1]); const name=parts.slice(1,-1).join(" "); if(!Number.isInteger(value)||value<0||value>1000000000) throw new Error("XP amount must be a whole number from 0 to 1,000,000,000.");
+        const xp=await currentXp(name)+value; await setXp(name,xp); log("Gave "+value+" XP to "+name+". New XP: "+xp+"."); return;
+      }
+      throw new Error("Unknown command. Type /commands.");
+    }catch(e){log("ERROR: "+(e.message||e));}
+  }
+  document.addEventListener("keydown",function(e){
+    if(e.key==="/" && !e.ctrlKey && !e.altKey && !e.metaKey && !["INPUT","TEXTAREA"].includes(document.activeElement?.tagName) && !document.activeElement?.isContentEditable){
+      if(checkOwner()){e.preventDefault();open();}
+    }
+    if(e.key==="Escape" && bar.classList.contains("open")) closeBar();
+  });
+  input.addEventListener("keydown",function(e){ if(e.key==="Enter"){e.preventDefault();runCommand(input.value);input.value="";} });
+  close.addEventListener("click",closeBar);
+  // Make the global level/XP override visible to the existing level UI when the user has an xp value.
+  async function loadOwnXp(){
+    try{
+      const name=profileName(); if(!name||!supabaseReady())return;
+      const rows=await getUsersByName(name); if(rows.length!==1)return;
+      const r=await fetch(SUPABASE_URL+"/rest/v1/users?select=xp&id=eq."+encodeURIComponent(rows[0].id),{headers:headers()}); if(!r.ok)return;
+      const data=await r.json(); const xp=Number(data[0]?.xp); if(Number.isFinite(xp)){
+        window.__njServerXp=xp;
+        if(typeof renderLevelPanel==="function") renderLevelPanel();
+      }
+    }catch(e){}
+  }
+  const originalGetTotalXp=window.getTotalXp;
+  if(typeof originalGetTotalXp==="function") window.getTotalXp=function(){ return Number.isFinite(window.__njServerXp) ? window.__njServerXp : originalGetTotalXp(); };
+  document.addEventListener("DOMContentLoaded",function(){setTimeout(loadOwnXp,1200);});
 })();
 </script>
 </body>
