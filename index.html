@@ -682,7 +682,7 @@
     <a href="https://notjase5607.github.io/FishTracker/fishmap.html" role="button">Map</a>
     <a href="#" role="button" onclick="openAchievements(); return false;">Achievements</a>
     <a href="#" role="button" onclick="openSocial(); return false;">Social</a>
-    <a href="#" role="button" onclick="openFriends(); return false;">Friends</a>
+    <a href="javascript:void(0)" role="button" onclick="openFriends(); return false;">Friends</a>
 </div>
 </header>
 
@@ -17402,6 +17402,24 @@ window.addEventListener('DOMContentLoaded', () => {
   sw.addEventListener('click',()=>setMode(mode==='signup'?'login':'signup'));
   window.njFishTrackerLogout=function(){localStorage.removeItem('nj_fishtracker_session');localStorage.removeItem('nj_fishtracker_user');location.reload()};
   document.addEventListener('DOMContentLoaded',async()=>{document.body.style.overflow='hidden';if(!(await refreshExisting()))setMode('signup')});
+})();
+</script>
+<script id="friends-nav-fix">
+(function(){
+  function fixFriendsNav(){
+    var links=document.querySelectorAll(".header-nav a");
+    links.forEach(function(a){
+      if ((a.textContent||"").trim().toLowerCase()==="friends") {
+        a.setAttribute("href","javascript:void(0)");
+        a.addEventListener("click",function(e){
+          e.preventDefault(); e.stopPropagation();
+          if (typeof window.openFriends === "function") window.openFriends();
+          return false;
+        },true);
+      }
+    });
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fixFriendsNav); else fixFriendsNav();
 })();
 </script>
 </body>
