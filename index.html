@@ -16529,14 +16529,22 @@ async function startSocialIdentity() {
 /* ---- Friends modal ---- */
 function openFriends() {
     const modal = document.getElementById("friendsModal");
-    if (!modal) return;
-    friendView = "friends";
-    fillProfileFields();
-    refreshFriends();
-    renderFriendsView();
+    if (!modal) {
+        console.error("Fish Tracker: friendsModal not found");
+        return;
+    }
+
+    // Open the window FIRST so a profile/backend error cannot stop the UI.
     modal.style.display = "flex";
+    modal.style.zIndex = "100000";
     document.body.style.overflow = "hidden";
+
+    try { friendView = "friends"; } catch (e) {}
+    try { fillProfileFields(); } catch (e) { console.error("Friends profile error:", e); }
+    try { renderFriendsView(); } catch (e) { console.error("Friends render error:", e); }
+    try { refreshFriends(); } catch (e) { console.error("Friends refresh error:", e); }
 }
+window.openFriends = openFriends;
 
 function closeFriends() {
     const modal = document.getElementById("friendsModal");
@@ -17406,20 +17414,20 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 <script id="friends-nav-fix">
 (function(){
-  function fixFriendsNav(){
-    var links=document.querySelectorAll(".header-nav a");
-    links.forEach(function(a){
-      if ((a.textContent||"").trim().toLowerCase()==="friends") {
-        a.setAttribute("href","javascript:void(0)");
-        a.addEventListener("click",function(e){
-          e.preventDefault(); e.stopPropagation();
-          if (typeof window.openFriends === "function") window.openFriends();
-          return false;
-        },true);
-      }
+  function bindFriends(){
+    var links=document.querySelectorAll('.header-nav a, .header-nav button');
+    links.forEach(function(el){
+      if ((el.textContent||'').trim().toLowerCase() !== 'friends') return;
+      el.setAttribute('type','button');
+      el.onclick=function(e){
+        if(e){e.preventDefault();e.stopPropagation();}
+        if(typeof window.openFriends==='function') window.openFriends();
+        return false;
+      };
     });
   }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fixFriendsNav); else fixFriendsNav();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindFriends);
+  else bindFriends();
 })();
 </script>
 </body>
